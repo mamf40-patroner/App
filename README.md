@@ -24,3 +24,7 @@ npm install
 ```
 
 Then start the application by running `npm start`.
+
+If you want to preview the application on your phone, install the *Expo* client
+from your digital distribution service, and follow the instructions on the
+screen (e.g scan the QR code from the terminal).
