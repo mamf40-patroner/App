@@ -27,7 +27,7 @@ export async function getPois(coordinate, types = [], range = 7000) {
       ...(groups.length && { category_group_ids: groups }),
       ...(categories.length && { category_ids: categories }),
     }
-  })
+  });
 }
 
 export async function getDirections(coordinates) {
