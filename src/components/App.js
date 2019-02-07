@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { ViewPager } from 'rn-viewpager';
 import Map from './Map';
-import Slider from './Slider';
+import OverlaySlider from './OverlaySlider';
 import SearchForm from './SearchForm';
 
 export default class App extends React.Component {
@@ -10,7 +10,7 @@ export default class App extends React.Component {
     return (
       <View style={styles.container}>
         <Map />
-        <Slider>
+        <OverlaySlider>
           <ViewPager style={styles.pager}>
             <View key="1">
               <SearchForm />
@@ -20,7 +20,7 @@ export default class App extends React.Component {
               <Text>SEARCH RESULTS</Text>
             </View>
           </ViewPager>
-        </Slider>
+        </OverlaySlider>
       </View>
     );
   }

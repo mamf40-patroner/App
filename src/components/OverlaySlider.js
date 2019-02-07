@@ -13,7 +13,7 @@ const minHeight = 0;
 const backDropColor = '#02744B';
 const maxHeight = Dimensions.get('window').height - 83;
 
-export default class Slider extends React.Component {
+export default class OverlaySlider extends React.Component {
   constructor(props) {
     super(props);
     this.moveUp = this.moveUp.bind(this.moveUp);
