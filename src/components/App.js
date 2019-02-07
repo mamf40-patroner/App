@@ -1,12 +1,26 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
+import { ViewPager } from 'rn-viewpager';
 import Map from './Map';
+import Slider from './Slider';
+import SearchForm from './SearchForm';
 
 export default class App extends React.Component {
   render() {
     return (
       <View style={styles.container}>
         <Map />
+        <Slider>
+          <ViewPager style={styles.pager}>
+            <View key="1">
+              <SearchForm />
+            </View>
+
+            <View key="2">
+              <Text>SEARCH RESULTS</Text>
+            </View>
+          </ViewPager>
+        </Slider>
       </View>
     );
   }
@@ -19,4 +33,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  pager: {
+    flex: 1
+  }
 });
