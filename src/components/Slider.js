@@ -92,7 +92,9 @@ export default class Slider extends React.Component {
             borderRadius: 10,
             overflow: 'hidden',
           }}
-        />
+        >
+          {this.props.children}
+        </View>
 
         <View
           {...this._panResponder.panHandlers}
