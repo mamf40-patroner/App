@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { ViewPager } from 'rn-viewpager';
 import Map from './Map';
 import OverlaySlider from './OverlaySlider';
+import SearchResult from './SearchResult';
 import SearchForm from './SearchForm';
 
 export default class App extends React.Component {
@@ -17,7 +18,7 @@ export default class App extends React.Component {
             </View>
 
             <View key="2">
-              <Text>SEARCH RESULTS</Text>
+              <SearchResult items={mockItems} />
             </View>
           </ViewPager>
         </OverlaySlider>
@@ -37,3 +38,18 @@ const styles = StyleSheet.create({
     flex: 1
   }
 });
+
+const mockItems = [
+  {
+    name: 'Max',
+    avatar_url: 'https://image.shutterstock.com/image-vector/chef-logo-restaurant-symbol-vector-260nw-334673846.jpg',
+    subtitle: 'Restaurang',
+    distance: '500m'
+  },
+  {
+    name: 'Saltbadet',
+    avatar_url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmbSe7gXHIQAhfZUmn_YX7geLM51M-t1w2aOQTzWKyy3bNnJIn',
+    subtitle: 'Bad',
+    distance: '700m'
+  },
+]

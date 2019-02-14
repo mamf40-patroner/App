@@ -34,7 +34,7 @@ export async function getDirections(coordinates) {
   const api = new Directions({ api_key: OPENROUTESERVICE_KEY });
 
   return api.calculate({
-    coordinates: coordinates,
+    coordinates,
     profile: 'cycling-regular',
     geometry_format: 'polyline',
     format: 'json'
