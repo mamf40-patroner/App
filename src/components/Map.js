@@ -5,7 +5,7 @@ import MapView, { Marker } from 'react-native-maps';
 export default class Map extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {onMapReady: props.onMapReady};
   }
 
   componentDidMount() {
@@ -18,7 +18,7 @@ export default class Map extends React.Component {
     const { location } = this.state;
 
     return (
-      <MapView style={StyleSheet.absoluteFillObject}>
+      <MapView style={StyleSheet.absoluteFillObject} onMapReady={this.state.onMapReady}>
         {location && (
           <Marker
             coordinate={location}

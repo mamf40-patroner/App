@@ -5,12 +5,17 @@ import Map from './Map';
 import OverlaySlider from './OverlaySlider';
 import SearchResult from './SearchResult';
 import SearchForm from './SearchForm';
+import { SplashScreen } from 'expo';
 
 export default class App extends React.Component {
+  componentDidMount() {
+    SplashScreen.preventAutoHide();
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <Map />
+        <Map onMapReady = {() => SplashScreen.hide()} />
         <OverlaySlider>
           <ViewPager style={styles.pager}>
             <View key="1">
