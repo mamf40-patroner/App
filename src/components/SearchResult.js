@@ -16,16 +16,17 @@ export default class SearchResult extends React.Component {
         {
           this.state.items.map((item) => (
             <ListItem
+              avatarStyle={styles.avatarStyle}
               containerStyle={{ backgroundColor: '#00754b' }}
               contentContainerStyle={{ backgroundColor: '#00754b' }}
-              avatarStyle={styles.avatarStyle}
-              titleStyle={{ color: 'white' }}
-              subtitleStyle={{ color: 'white' }}
-              leftAvatar={{ uri: item.avatar_url }}
               key={item.name}
-              title={item.name}
-              subtitle={item.subtitle}
+              leftAvatar={{ uri: item.avatar_url }}
+              onPress={this.props.onSelect.bind(null, item)}
               rightTitle={item.distance}
+              subtitle={item.subtitle}
+              subtitleStyle={{ color: 'white' }}
+              title={item.name}
+              titleStyle={{ color: 'white' }}
             />
           ))
         }

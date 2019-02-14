@@ -18,12 +18,19 @@ export default class App extends React.Component {
             </View>
 
             <View key="2">
-              <SearchResult items={mockItems} />
+              <SearchResult
+                items={mockItems}
+                onSelect={this.handleActivitySelect.bind(this)}
+              />
             </View>
           </ViewPager>
         </OverlaySlider>
       </View>
     );
+  }
+
+  handleActivitySelect(item) {
+    console.log(item);
   }
 }
 
