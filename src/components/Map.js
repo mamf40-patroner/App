@@ -3,11 +3,6 @@ import { StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
 export default class Map extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {onMapReady: props.onMapReady};
-  }
-
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(pos => {
       this.setState({ location: pos.coords });
@@ -18,7 +13,7 @@ export default class Map extends React.Component {
     const { location } = this.state;
 
     return (
-      <MapView style={StyleSheet.absoluteFillObject} onMapReady={this.state.onMapReady}>
+      <MapView style={StyleSheet.absoluteFillObject} onMapReady={this.props.onMapReady}>
         {location && (
           <Marker
             coordinate={location}
