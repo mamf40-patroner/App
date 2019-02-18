@@ -3,6 +3,11 @@ import { StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
 export default class Map extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { location: null }
+  }
+
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(pos => {
       this.setState({ location: pos.coords });

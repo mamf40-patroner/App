@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   },
   pager: {
     flex: 1
-  }
+  },
 });
 
 const mockItems = [
