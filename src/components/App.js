@@ -6,6 +6,7 @@ import OverlaySlider from './OverlaySlider';
 import SearchResult from './SearchResult';
 import SearchForm from './SearchForm';
 import { SplashScreen } from 'expo';
+import { categories } from '../constants';
 
 export default class App extends React.Component {
   componentDidMount() {
@@ -19,7 +20,7 @@ export default class App extends React.Component {
         <OverlaySlider>
           <ViewPager style={styles.pager}>
             <View key="1">
-              <SearchForm />
+              <SearchForm items={categories} />
             </View>
 
             <View key="2">

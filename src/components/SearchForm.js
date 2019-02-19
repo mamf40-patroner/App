@@ -3,206 +3,168 @@ import {
   StyleSheet,
   Text,
   View,
-  CheckBox,
   TextInput,
+  FlatList,
+  Button,
+  TouchableHighlight,
   Image,
-  TouchableOpacity,
 } from 'react-native';
+import ModalSelector from 'react-native-modal-selector';
+import R from 'ramda';
 
 export default class SearchForm extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
-    this.stateCB = { data: ['Skog', 'Strand', 'Stad'], checked: 0 };
+    this.idCounter = 0;
+    this.state = {
+      origin: null,
+      selectedCategory: null,
+      selectedSubcategory: null,
+      addedCategories: [],
+    };
+  }
+
+  deleteCategoryByKey = (keyToRemove) => {
+    this.setState({
+      addedCategories: this.state.addedCategories.filter(({ key }) => key != keyToRemove)
+    });
+  }
+
+  addCategory = (category) => {
+    this.setState({
+      addedCategories: [
+        ...this.state.addedCategories,
+        { ...category, key: String(++this.idCounter) },
+      ]
+    });
+  }
+
+  onSubmit = () => {
+    const { origin, addedCategories } = this.state;
+    this.props.onSubmit({ origin, categories: addedCategories });
   }
 
   render() {
+    const isValidForm = this.state.addedCategories.length > 0 && this.state.origin !== null;
+    const activeSubcategories = this.state.selectedCategory !== null
+      ? this.props.items.find((category) => this.state.selectedCategory === category).subcategories
+      : [];
+
     return (
       <View style={styles.container}>
-        <View style={styles.block}>
-          <View style={styles.row}>
-            <Text> Från: </Text>
-
-            <TextInput
-              style={styles.textfield}
-              underlineColorAndroid="transparent"
-              onChangeText={text => this.setState({ text })}
-              startPos={this.state.text}
-            />
-          </View>
-
-          <View style={styles.row}>
-            <Text>Ruttlängd: </Text>
-
-            <TextInput
-              style={styles.textfield}
-              onChangeText={text => this.setState({ text })}
-            />
-          </View>
+        <View style={styles.group}>
+          <Text style={styles.label}>Utgångspunkt:</Text>
+          <TextInput
+            style={styles.input}
+            underlineColorAndroid="transparent"
+            onChangeText={origin => this.setState({ origin })}
+          />
         </View>
 
         <View style={styles.separator} />
 
-        <View style={styles.block}>
-          <View style={styles.row}>
-            <Text>Omgivning: </Text>
-          </View>
+        <View style={styles.group}>
+          <Text style={styles.label}>Kategori:</Text>
+          <ModalSelector
+            style={styles.input}
+            data={this.props.items}
+            keyExtractor={R.prop('name')}
+            labelExtractor={R.prop('name')}
+            onChange={(selectedCategory) => this.setState({ selectedCategory })}
+            initValue="Välj kategori"
+          />
         </View>
 
-        <View style={styles.block}>
-          {this.stateCB.data.map((data, key) => {
-            return (
-              <View key={data}>
-                {this.stateCB.checked == key ? (
-                  <TouchableOpacity style={styles.btn}>
-                    <Image
-                      style={styles.img}
-                      source={{
-                        uri:
-                          'https://d30y9cdsu7xlg0.cloudfront.net/png/868143-200.png',
-                      }}
-                    />
-                    <Text>{data}</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    onPress={() => {
-                      this.state.setState({ checked: key });
-                    }}
-                    style={styles.btn}
-                  >
-                    <Image
-                      style={styles.img}
-                      source={{
-                        uri:
-                          'https://d30y9cdsu7xlg0.cloudfront.net/png/868142-200.png',
-                      }}
-                    />
-                    <Text>{data}</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            );
-          })}
+        <View style={styles.group}>
+          <Text style={styles.label}>Aktivitet:</Text>
+          <ModalSelector
+            style={styles.input}
+            data={activeSubcategories}
+            keyExtractor={R.prop('name')}
+            labelExtractor={R.prop('name')}
+            onChange={(selectedSubcategory) => this.setState({ selectedSubcategory })}
+            disabled={this.state.selectedCategory === null}
+            initValue="Välj underkategori"
+          />
         </View>
 
-        <View style={styles.separator} />
+        <Button
+          color="green"
+          title="Lägg Till"
+          disabled={this.state.selectedSubcategory === null}
+          onPress={() => this.addCategory(this.state.selectedSubcategory)}
+        />
 
-        <View style={styles.block}>
-          <View style={styles.row}>
-            <Text>Aktiviteter: </Text>
+        <FlatList
+          style={styles.list}
+          data={this.state.addedCategories}
+          renderItem={({ item }) => (
+            <TouchableHighlight onPress={() => this.deleteCategoryByKey(item.key)}>
+              <Text style={styles.categoryLabel}>{item.name}</Text>
+            </TouchableHighlight>
+          )}
+        />
 
-            <TextInput
-              style={styles.textfield}
-              onChangeText={text => this.setState({ text })}
-              startPos={this.state.text}
-            />
-          </View>
-        </View>
-
-        <View style={{ flexDirection: 'column' }}>
-          <View style={{ flexDirection: 'row' }}>
-            <CheckBox
-              value={this.state.checked}
-              onValueChange={checked =>
-                this.setState({ checked: !this.state.checked })
-              }
-              distance={this.setState}
-            />
-            <Text style={{ marginTop: 5 }}>Undvik trafik</Text>
-
-            <CheckBox
-              value={this.state.checked}
-              onValueChange={() =>
-                this.setState({ checked: !this.state.checked })
-              }
-            />
-            <Text style={{ marginTop: 5 }}>Undvik grusvägar</Text>
-
-            <CheckBox
-              value={this.state.checked}
-              onValueChange={() =>
-                this.setState({ checked: !this.state.checked })
-              }
-            />
-            <Text style={{ marginTop: 5 }}>Undvik backar</Text>
-          </View>
-
-          <View style={{ flexDirection: 'row' }}>
-            <CheckBox
-              value={this.state.checked}
-              onValueChange={() =>
-                this.setState({ checked: !this.state.checked })
-              }
-            />
-            <Text style={{ marginTop: 5 }}>Bad</Text>
-
-            <CheckBox
-              value={this.state.checked}
-              onValueChange={() =>
-                this.setState({ checked: !this.state.checked })
-              }
-            />
-            <Text style={{ marginTop: 5 }}>Café</Text>
-
-            <CheckBox
-              value={this.state.checked}
-              onValueChange={() =>
-                this.setState({ checked: !this.state.checked })
-              }
-            />
-            <Text style={{ marginTop: 5 }}>Max</Text>
-
-            <CheckBox
-              value={this.state.checked}
-              onValueChange={() =>
-                this.setState({ checked: !this.state.checked })
-              }
-            />
-            <Text style={{ marginTop: 5 }}>Annat</Text>
-          </View>
-        </View>
+        <TouchableHighlight
+          onPress={this.onSubmit}
+          disabled={isValidForm}
+          style={styles.submit}
+        >
+          <Image source={require('../../assets/cont.jpg')} />
+        </TouchableHighlight>
       </View>
     );
+  }
+
+  static defaultProps = {
+    onSubmit: () => { },
   }
 }
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: 10,
+    backgroundColor: '#00754b',
     flex: 1,
-    backgroundColor: '#00754b',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: 'column',
   },
-  row: {
+  group: {
+    flex: 0,
     flexDirection: 'row',
-    backgroundColor: '#00754b',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    padding: 5,
+    margin: 10,
+    justifyContent: 'space-between',
   },
-  textfield: {
+  label: {
+    flex: 1,
+    alignSelf: 'center',
+  },
+  input: {
+    flex: 2,
     height: 40,
-    width: 200,
     borderColor: 'black',
     backgroundColor: 'white',
     borderWidth: 1,
+    marginLeft: 10,
   },
   separator: {
     backgroundColor: '#044229',
-    width: 400,
-    height: 7,
+    width: '100%',
+    height: 3,
   },
-  block: {
-    padding: 10,
-    justifyContent: 'center',
+  list: {
+    borderColor: '#044229',
+    borderWidth: 3,
+    backgroundColor: 'white',
+    flex: 1,
+    margin: 10,
   },
-  img: {
-    height: 30,
-    resizeMode: 'contain',
-    marginRight: 5,
+  categoryLabel: {
+    fontSize: 22,
+    margin: 5,
   },
-  btn: {
-    marginLeft: 5,
-  },
+  submit: {
+    alignSelf: 'flex-end',
+    margin: 10,
+    marginTop: 0,
+  }
 });
