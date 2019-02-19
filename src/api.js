@@ -2,11 +2,11 @@ import { OPENROUTESERVICE_KEY } from 'react-native-dotenv';
 import axios from 'axios';
 import R from 'ramda';
 
-async function getBoundingBox(coordinate, range) {
+async function getBoundingBox({ longitude, latitude }, range) {
   return axios.get('https://api.openrouteservice.org/isochrones', {
     params: {
       api_key: OPENROUTESERVICE_KEY,
-      locations: coordinate.join(','),
+      locations: `${longitude},${latitude}`,
       profile: 'cycling-regular',
       range_type: 'distance',
       range,
