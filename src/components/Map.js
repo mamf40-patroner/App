@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import { getCurrentLocation } from '../api';
 
 export default class Map extends React.Component {
   constructor(props) {
@@ -8,10 +9,9 @@ export default class Map extends React.Component {
     this.state = { location: null }
   }
 
-  componentDidMount() {
-    navigator.geolocation.getCurrentPosition(pos => {
-      this.setState({ location: pos.coords });
-    });
+  async componentDidMount() {
+    const location = await getCurrentLocation();
+    this.setState({ location })
   }
 
   render() {
