@@ -27,7 +27,7 @@ export default class OverlaySlider extends React.Component {
 
       onPanResponderMove: (evt, gestureState) => {
         change = gestureState.dy + startpoint;
-        if (change !== startpoint) {
+        if (change < startpoint - 10 || change > startpoint + 10) {
           press = false;
         }
         if (change > minHeight && change < maxHeight) {
@@ -46,12 +46,29 @@ export default class OverlaySlider extends React.Component {
             startpoint = maxHeight;
           }
         } else {
+          if (gestureState.vy < -0.5) {
+            yChange -= 200;
+            if (yChange < minHeight) yChange = minHeight;
+            this.move(yChange, 200);
+          } else if (gestureState.vy > 0.5) {
+            yChange += 200;
+            if (yChange > maxHeight) yChange = maxHeight;
+            this.move(yChange, 200);
+          }
           startpoint = yChange;
         }
         press = true;
       },
     });
   }
+
+
+  move = (target, speed) => {
+    Animated.timing(this.state.heightA, {
+      toValue: target,
+      duration: speed,
+    }).start();
+  };
 
   moveUp = () => {
     Animated.timing(this.state.heightA, {
@@ -75,7 +92,6 @@ export default class OverlaySlider extends React.Component {
             flex: 2,
             backgroundColor: 'transparent',
             width: '92%',
-            left: '4%',
           },
           {
             top: this.state.heightA,
