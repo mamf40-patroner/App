@@ -107,7 +107,7 @@ export default class SearchForm extends React.Component {
 
         <TouchableHighlight
           onPress={this.onSubmit}
-          disabled={isValidForm}
+          disabled={!isValidForm}
           style={styles.submit}
         >
           <Image source={require('../../assets/cont.jpg')} />
