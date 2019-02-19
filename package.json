@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^9.0.0",
+    "axios": "^0.18.0",
     "expo": "^30.0.1",
     "expo-cli": "^2.6.5",
-    "openrouteservice-js": "^0.0.3",
     "ramda": "^0.26.1",
     "react": "16.3.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz",

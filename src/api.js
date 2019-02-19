@@ -1,33 +1,40 @@
 import { OPENROUTESERVICE_KEY } from 'react-native-dotenv';
-import { Directions, Isochrones, Pois } from 'openrouteservice-js';
+import axios from 'axios';
 import R from 'ramda';
 
 async function getBoundingBox(coordinate, range) {
-  const api = new Isochrones({ api_key: OPENROUTESERVICE_KEY });
-  return api.calculate({
-    locations: [coordinate],
-    profile: 'cycling-regular',
-    range_type: 'distance',
-    range,
-  }).then(result => R.splitEvery(2, result.bbox));
+  return axios.get('https://api.openrouteservice.org/isochrones', {
+    params: {
+      api_key: OPENROUTESERVICE_KEY,
+      locations: coordinate.join(','),
+      profile: 'cycling-regular',
+      range_type: 'distance',
+      range,
+    }
+  }).then(({ data }) => R.splitEvery(2, data.bbox))
 }
 
-export async function getPois(coordinate, types = [], range = 7000) {
-  const api = new Pois({ api_key: OPENROUTESERVICE_KEY });
-  const bbox = await getBoundingBox(coordinate, Math.min(range, 7000));
+export async function getPois(coordinate, types = [], range = 2000) {
+  const bbox = await getBoundingBox(coordinate, Math.min(range, 2000));
 
   const isGroupCategory = type => type % 10 == 0;
   const groups = types.filter(isGroupCategory);
   const categories = types.filter(R.complement(isGroupCategory));
 
-  return api.pois({
+  const filters = {}
+  if (groups.length > 0) {
+    filters.category_group_ids = groups;
+  }
+
+  if (categories.length > 0) {
+    filters.category_ids = categories;
+  }
+
+  return axios.post(`https://api.openrouteservice.org/pois?api_key=${OPENROUTESERVICE_KEY}`, {
     request: 'pois',
     geometry: { bbox },
-    filters: {
-      ...(groups.length && { category_group_ids: groups }),
-      ...(categories.length && { category_ids: categories }),
-    }
-  });
+    filters,
+  }).then(({ data }) => data.features);
 }
 
 export async function getDirections(coordinates) {
@@ -40,5 +47,13 @@ export async function getDirections(coordinates) {
     format: 'json'
   }).then(path => {
     console.log(JSON.stringify(path));
+  });
+}
+
+export async function getCurrentLocation() {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(function({ coords }) {
+      resolve(coords);
+    }, reject);
   });
 }
