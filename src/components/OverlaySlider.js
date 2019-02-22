@@ -6,6 +6,7 @@ import {
   PanResponder,
   ImageBackground,
 } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 
 var yChange = 0;
 var press = true;
@@ -124,8 +125,10 @@ export default class OverlaySlider extends React.Component {
             alignSelf: 'center',
           }}
         >
-          <ImageBackground
-            source={require("../../assets/scrollSign.jpg")}
+          <FontAwesome
+            name="navicon"
+            size={32}
+            color="white"
             style={{
               width: '72%',
               height: '80%',
@@ -152,14 +155,15 @@ export default class OverlaySlider extends React.Component {
             borderColor: backDropColor,
           }}
         >
-          <ImageBackground
-            source={require('../../assets/arrowSign.jpg')}
+          <FontAwesome
+            name="location-arrow"
+            size={32}
+            color="green"
             style={{
               width: '75%',
               height: '80%',
               alignSelf: 'center',
-              left: '10%',
-              top: '15%',
+              top: '10%',
             }}
           />
         </View>
@@ -177,15 +181,14 @@ export default class OverlaySlider extends React.Component {
             borderColor: backDropColor,
           }}
         >
-          <ImageBackground
-            source={require('../../assets/settingsSign.jpg')}
+          <FontAwesome
+            name="cog"
+            size={32}
+            color="green"
             style={{
-              width: '80%',
-              height: '80%',
               borderRadius: 100,
               alignSelf: 'center',
-              left: '9%',
-              top: '15%',
+              top: '7.5%',
             }}
           />
         </View>

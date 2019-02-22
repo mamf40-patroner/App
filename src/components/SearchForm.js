@@ -11,6 +11,7 @@ import {
 import { Button } from 'react-native-elements';
 import ModalSelector from 'react-native-modal-selector';
 import R from 'ramda';
+import { FontAwesome } from '@expo/vector-icons';
 
 export default class SearchForm extends React.Component {
   constructor(props) {
@@ -110,7 +111,14 @@ export default class SearchForm extends React.Component {
           disabled={!isValidForm}
           style={styles.submit}
         >
-          <Image source={require('../../assets/cont.jpg')} />
+          <FontAwesome
+            name="mail-forward"
+            size={32}
+            color="white"
+            style={{
+              transform: [{ scaleY: -1 }]
+            }}
+          />
         </TouchableHighlight>
       </View>
     );
