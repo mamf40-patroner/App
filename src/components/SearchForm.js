@@ -5,10 +5,10 @@ import {
   View,
   TextInput,
   FlatList,
-  Button,
   TouchableHighlight,
   Image,
 } from 'react-native';
+import { Button } from 'react-native-elements';
 import ModalSelector from 'react-native-modal-selector';
 import R from 'ramda';
 
@@ -89,8 +89,8 @@ export default class SearchForm extends React.Component {
         </View>
 
         <Button
-          color="green"
           title="Lägg Till"
+          buttonStyle={styles.buttonAdd}
           disabled={this.state.selectedSubcategory === null}
           onPress={() => this.addCategory(this.state.selectedSubcategory)}
         />
@@ -158,6 +158,12 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 10,
   },
+  buttonAdd: {
+    margin: 10,
+    borderWidth: 1,
+    borderColor: '#000000',
+    backgroundColor: '#3baf5b',
+  },
   categoryLabel: {
     fontSize: 22,
     margin: 5,
@@ -166,5 +172,5 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     margin: 10,
     marginTop: 0,
-  }
+  },
 });
