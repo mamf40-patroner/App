@@ -14,18 +14,18 @@ export default class SearchResult extends React.Component {
     return (
       <View style={styles.container}>
         {
-          this.state.items.map((item) => (
+          this.state.items.map(item => (
             <ListItem
               avatarStyle={styles.avatarStyle}
               containerStyle={{ backgroundColor: '#00754b' }}
               contentContainerStyle={{ backgroundColor: '#00754b' }}
-              key={item.name}
-              leftAvatar={{ uri: item.avatar_url }}
+              key={item.properties.osm_id}
+              leftAvatar={{ uri: 'https://image.shutterstock.com/image-vector/chef-logo-restaurant-symbol-vector-260nw-334673846.jpg' }}
               onPress={this.props.onSelect.bind(null, item)}
-              rightTitle={item.distance}
-              subtitle={item.subtitle}
+              rightTitle={item.properties.distance.toString()}
+              subtitle={"SUBTITLE"}
               subtitleStyle={{ color: 'white' }}
-              title={item.name}
+              title={item.properties.osm_tags.name}
               titleStyle={{ color: 'white' }}
             />
           ))

@@ -1,20 +1,26 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { ViewPager } from 'rn-viewpager';
+import { SplashScreen } from 'expo';
+import R from 'ramda';
 import Map from './Map';
 import OverlaySlider from './OverlaySlider';
 import SearchResult from './SearchResult';
 import SearchForm from './SearchForm';
-import { SplashScreen } from 'expo';
 import { categories } from '../constants';
-import { getCurrentLocation, getPois } from '../api';
+import { getCurrentLocation, getPois, getDirections } from '../api';
 
 export default class App extends React.Component {
   constructor(props) {
     super(props)
+    this.slider = React.createRef();
+    this.map = React.createRef();
+
+    this.route = { origin: null, pois: [] };
     this.state = {
+      polyline: null,
       loading: false,
       query: null,
+      pois: [],
     }
   }
 
@@ -22,49 +28,89 @@ export default class App extends React.Component {
     SplashScreen.preventAutoHide();
   }
 
+  renderBody() {
+    return this.state.pois.length > 0 ? (
+      <SearchResult
+        items={this.state.pois[0]}
+        onSelect={this.handleActivitySelect.bind(this)}
+      />
+    ) : (
+      <SearchForm
+        items={categories}
+        onSubmit={this.handleSearchQuery.bind(this)}
+      />
+    );
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <Map onMapReady = {() => SplashScreen.hide()} />
-        <OverlaySlider>
-          <ViewPager style={styles.pager}>
-            <View key="1">
-              <SearchForm
-                items={categories}
-                onSubmit={this.handleSearchQuery.bind(this)}
-              />
-            </View>
-
-            <View key="2">
-              <SearchResult
-                items={mockItems}
-                onSelect={this.handleActivitySelect.bind(this)}
-              />
-            </View>
-          </ViewPager>
+        <Map
+          ref={this.map}
+          route={this.state.polyline}
+          onMapReady={() => SplashScreen.hide()}
+        />
+        <OverlaySlider ref={this.slider}>
+          {this.renderBody()}
           {this.state.loading && <ActivityIndicator style={styles.loader} />}
         </OverlaySlider>
       </View>
     );
   }
 
-  async handleActivitySelect(item) {
-    console.log(item);
+  async handleActivitySelect(poi) {
+    this.route.pois.push(poi);
+    await this.setStateAsync({ pois: this.state.pois.slice(1) });
+
+    if (this.state.pois.length !== 0) {
+      return;
+    }
+
+    const path = [
+      this.route.origin,
+      ...this.route.pois.map(p => {
+        const [longitude, latitude] = p.geometry.coordinates;
+        return { longitude, latitude };
+      }),
+      this.route.origin,
+    ];
+
+    this.setState({ loading: true });
+    try {
+      const directions = await getDirections(path);
+
+      const [route] = directions.routes;
+      const bbox = R.splitEvery(2, route.bbox).map(([longitude, latitude]) => ({ longitude, latitude }));
+      const polyline = route.geometry.map(([longitude, latitude]) => ({ longitude, latitude }));
+
+      await this.setStateAsync({ polyline });
+
+      this.map.current.focusBoundingBox(bbox);
+      this.slider.current.moveDown();
+    } catch (ex) {
+      console.log("Failed to retrieve directions", ex, Object.keys(ex));
+    } finally {
+      this.setState({ loading: false });
+    }
   }
 
   async handleSearchQuery({ categories }) {
     this.setState({ loading: true });
     try {
       const coords = await getCurrentLocation();
-      const pois = await getPois(coords, categories.map(({ id }) => id));
-      const namedPois = pois.filter(poi => !!poi.properties.osm_tags.name);
-      console.log(namedPois);
+      const pois = await Promise.all(categories.map(({ id }) => getPois(coords, [id])));
+      const namedPois = pois.map(l => l.filter(poi => !!poi.properties.osm_tags.name));
+
+      this.route.origin = coords;
+      this.setState({ pois: namedPois });
     } catch (ex) {
-      console.log("Failed to find POIs", ex);
+      console.log("Failed to find POIs", ex, Object.keys(ex));
     } finally {
       this.setState({ loading: false });
     }
   }
+
+  setStateAsync = (updater) => new Promise(resolve => this.setState(updater, resolve))
 }
 
 const styles = StyleSheet.create({
@@ -86,18 +132,3 @@ const styles = StyleSheet.create({
     left: 0,
   }
 });
-
-const mockItems = [
-  {
-    name: 'Max',
-    avatar_url: 'https://image.shutterstock.com/image-vector/chef-logo-restaurant-symbol-vector-260nw-334673846.jpg',
-    subtitle: 'Restaurang',
-    distance: '500m'
-  },
-  {
-    name: 'Saltbadet',
-    avatar_url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmbSe7gXHIQAhfZUmn_YX7geLM51M-t1w2aOQTzWKyy3bNnJIn',
-    subtitle: 'Bad',
-    distance: '700m'
-  },
-]
