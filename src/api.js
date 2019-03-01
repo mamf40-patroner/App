@@ -56,6 +56,8 @@ export async function getCurrentLocation() {
   return new Promise(function (resolve, reject) {
     navigator.geolocation.getCurrentPosition(function ({ coords }) {
       resolve(coords);
-    }, reject);
+    },
+    reject,
+    {enableHighAccuracy: true});
   });
 }

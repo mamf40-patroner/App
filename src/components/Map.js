@@ -7,12 +7,21 @@ export default class Map extends React.Component {
   constructor(props) {
     super(props)
     this.map = React.createRef();
-    this.state = { location: null }
+    this.state = {
+      location: null,
+      error: null,
+    }
   }
 
   async componentDidMount() {
     const location = await getCurrentLocation();
-    this.setState({ location })
+    this.setState({ location });
+    setInterval(this._getLocation.bind(this), 500);
+  }
+
+  async updateLocation() {
+    const location = await getCurrentLocation();
+    this.setState({ location });
   }
 
   focusBoundingBox = ([topLeft, bottomRight]) => {
