@@ -58,6 +58,12 @@ export default class Map extends React.Component {
             title={"Nuvarande position"}
           />
         )}
+        {this.props.pois.map((poi) => (
+          <Marker
+            coordinate={poi.geometry.map(([longitude, latitude]) => ({ longitude, latitude }))}
+            title={poi.feature_properties.osm_tags.name}
+          />
+        ))}
       </MapView>
     );
   }

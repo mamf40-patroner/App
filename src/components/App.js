@@ -48,6 +48,7 @@ export default class App extends React.Component {
         <Map
           ref={this.map}
           route={this.state.polyline}
+          pois={this.state.pois}
           onMapReady={() => SplashScreen.hide()}
         />
         <OverlaySlider ref={this.slider}>
