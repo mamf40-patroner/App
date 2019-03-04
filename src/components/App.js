@@ -7,6 +7,7 @@ import OverlaySlider from './OverlaySlider';
 import SearchResult from './SearchResult';
 import SearchForm from './SearchForm';
 import { categories } from '../constants';
+import { coordsArrayToObject } from '../util';
 import { getCurrentLocation, getPois, getDirections } from '../api';
 
 export default class App extends React.Component {
@@ -15,12 +16,12 @@ export default class App extends React.Component {
     this.slider = React.createRef();
     this.map = React.createRef();
 
-    this.route = { origin: null, pois: [] };
+    this.selectedOrigin = null;
     this.state = {
-      polyline: null,
-      loading: false,
-      query: null,
-      pois: [],
+      route: null,
+      availablePois: [],
+      selectedPois: [],
+      isLoading: false,
     }
   }
 
@@ -29,9 +30,9 @@ export default class App extends React.Component {
   }
 
   renderBody() {
-    return this.state.pois.length > 0 ? (
+    return this.state.availablePois.length > 0 ? (
       <SearchResult
-        items={this.state.pois[0]}
+        items={this.state.availablePois[0]}
         onSelect={this.handleActivitySelect.bind(this)}
       />
     ) : (
@@ -47,67 +48,69 @@ export default class App extends React.Component {
       <View style={styles.container}>
         <Map
           ref={this.map}
-          route={this.state.polyline}
-          pois={this.state.pois}
+          route={this.state.route}
+          pois={this.state.selectedPois}
           onMapReady={() => SplashScreen.hide()}
         />
         <OverlaySlider ref={this.slider}>
           {this.renderBody()}
-          {this.state.loading && <ActivityIndicator style={styles.loader} />}
+          {this.state.isLoading && <ActivityIndicator style={styles.loader} />}
         </OverlaySlider>
       </View>
     );
   }
 
   async handleActivitySelect(poi) {
-    this.route.pois.push(poi);
-    await this.setStateAsync({ pois: this.state.pois.slice(1) });
+    await this.setStateAsync({
+      selectedPois: [...this.state.selectedPois, poi],
+      availablePois: this.state.availablePois.slice(1),
+    });
 
-    if (this.state.pois.length !== 0) {
+    if (this.state.availablePois.length !== 0) {
       return;
     }
 
     const path = [
-      this.route.origin,
-      ...this.route.pois.map(p => {
+      this.selectedOrigin,
+      ...this.state.selectedPois.map(p => {
         const [longitude, latitude] = p.geometry.coordinates;
         return { longitude, latitude };
       }),
-      this.route.origin,
+      this.selectedOrigin,
     ];
 
-    this.setState({ loading: true });
+    this.setState({ isLoading: true });
     try {
       const directions = await getDirections(path);
 
-      const [route] = directions.routes;
-      const bbox = R.splitEvery(2, route.bbox).map(([longitude, latitude]) => ({ longitude, latitude }));
-      const polyline = route.geometry.map(([longitude, latitude]) => ({ longitude, latitude }));
+      const [firstRoute] = directions.routes;
+      const bbox = R.splitEvery(2, firstRoute.bbox).map(coordsArrayToObject);
+      const route = firstRoute.geometry.map(coordsArrayToObject);
 
-      await this.setStateAsync({ polyline });
+      await this.setStateAsync({ route });
 
       this.map.current.focusBoundingBox(bbox);
       this.slider.current.moveDown();
     } catch (ex) {
       console.log("Failed to retrieve directions", ex, Object.keys(ex));
     } finally {
-      this.setState({ loading: false });
+      this.setState({ isLoading: false });
     }
   }
 
   async handleSearchQuery({ categories }) {
-    this.setState({ loading: true });
+    this.setState({ isLoading: true });
     try {
       const coords = await getCurrentLocation();
       const pois = await Promise.all(categories.map(({ id }) => getPois(coords, [id])));
       const namedPois = pois.map(l => l.filter(poi => !!poi.properties.osm_tags.name));
 
-      this.route.origin = coords;
-      this.setState({ pois: namedPois });
+      this.selectedOrigin = coords;
+      this.setState({ availablePois: namedPois });
     } catch (ex) {
       console.log("Failed to find POIs", ex, Object.keys(ex));
     } finally {
-      this.setState({ loading: false });
+      this.setState({ isLoading: false });
     }
   }
 

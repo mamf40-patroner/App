@@ -66,11 +66,10 @@ export async function getLocations(text) {
 }
 
 export async function getCurrentLocation() {
-  return new Promise(function (resolve, reject) {
-    navigator.geolocation.getCurrentPosition(function ({ coords }) {
-      resolve(coords);
-    },
-    reject,
-    {enableHighAccuracy: true});
+  return new Promise(function(resolve, reject) {
+    navigator.geolocation.getCurrentPosition(
+      R.pipe(R.prop('coords'), resolve),
+      reject,
+      { enableHighAccuracy: true });
   });
 }

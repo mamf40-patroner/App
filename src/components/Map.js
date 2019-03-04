@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { getCurrentLocation } from '../api';
+import { coordsArrayToObject } from '../util';
 
 export default class Map extends React.Component {
   constructor(props) {
@@ -16,7 +17,7 @@ export default class Map extends React.Component {
   async componentDidMount() {
     const location = await getCurrentLocation();
     this.setState({ location });
-    setInterval(this._getLocation.bind(this), 500);
+    setInterval(this.updateLocation.bind(this), 500);
   }
 
   async updateLocation() {
@@ -60,8 +61,9 @@ export default class Map extends React.Component {
         )}
         {this.props.pois.map((poi) => (
           <Marker
-            coordinate={poi.geometry.map(([longitude, latitude]) => ({ longitude, latitude }))}
-            title={poi.feature_properties.osm_tags.name}
+            key={String(poi.properties.osm_id)}
+            coordinate={coordsArrayToObject(poi.geometry.coordinates)}
+            title={poi.properties.osm_tags.name}
           />
         ))}
       </MapView>
