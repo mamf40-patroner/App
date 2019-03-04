@@ -105,8 +105,12 @@ export default class App extends React.Component {
       const pois = await Promise.all(categories.map(({ id }) => getPois(coords, [id])));
       const namedPois = pois.map(l => l.filter(poi => !!poi.properties.osm_tags.name));
 
-      this.selectedOrigin = coords;
-      this.setState({ availablePois: namedPois });
+      if (namedPois.some(R.isEmpty)) {
+        alert("En av dina valda kategorier har ej några attraktioner i närheten");
+      } else {
+        this.selectedOrigin = coords;
+        this.setState({ availablePois: namedPois });
+      }
     } catch (ex) {
       console.log("Failed to find POIs", ex, Object.keys(ex));
     } finally {
