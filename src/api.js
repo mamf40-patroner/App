@@ -52,6 +52,19 @@ export async function getDirections(coordinates) {
   }).then(R.prop('data'));
 }
 
+export async function getLocations(text) {
+  const { longitude, latitude } = await getCurrentLocation();
+  return ORS.get('geocode/search', {
+    params: {
+      text,
+      lang: 'sv',
+      'boundary.country': 'SE',
+      'focus.point.lon': longitude,
+      'focus.point.lat': latitude,
+    }
+  }).then(R.prop('data'));
+}
+
 export async function getCurrentLocation() {
   return new Promise(function (resolve, reject) {
     navigator.geolocation.getCurrentPosition(function ({ coords }) {
